@@ -1,0 +1,27 @@
+{
+  "name": "standartiser",
+  "version": "1.0.0",
+  "description": "thsi is tool for web developers",
+  "type": "module",
+  "main": "index.js",
+  "scripts": {
+    "dev": "nodemon src/server.ts",
+    "start": "node public/src/server.js"
+  },
+  "keywords": [
+    "UI",
+    "developers"
+  ],
+  "author": "Tsotne Darjania",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.11.10",
+    "nodemon": "^3.0.3",
+    "ts-node": "^10.9.2"
+  },
+  "dependencies": {
+    "@types/express": "^4.17.21",
+    "express": "^4.18.2",
+    "typescript": "^5.3.3"
+  }
+}
