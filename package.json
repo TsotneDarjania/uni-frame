@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "nodemon src/server.ts",
-    "start": "node public/src/server.js"
+    "dev": "esbuild src/main.ts --bundle --outfile=public/src/bundle.js && nodemon public/server.ts",
+    "build-server": "esbuild src/server.ts --bundle --outfile=public/src/serverBundle.js --format=esm --platform=node"
   },
   "keywords": [
     "UI",
@@ -16,8 +16,10 @@
   "license": "ISC",
   "devDependencies": {
     "@types/node": "^20.11.10",
+    "esbuild": "0.20.0",
     "nodemon": "^3.0.3",
-    "ts-node": "^10.9.2"
+    "ts-node": "^10.9.2",
+    "turbo": "^1.12.2"
   },
   "dependencies": {
     "@types/express": "^4.17.21",
