@@ -3,5 +3,5 @@
     "ts": "node --loader ts-node/esm"
   },
   "ext": "ts",
-  "watch": ["src", "public"]
+  "watch": ["src,", "public"]
 }

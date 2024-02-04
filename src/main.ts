@@ -1,1 +1,5 @@
-console.log("working");
+import MainManager from "./core/mainManager";
+
+const mainManager = new MainManager();
+
+console.log("aaa");

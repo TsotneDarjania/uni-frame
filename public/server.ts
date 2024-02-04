@@ -11,6 +11,7 @@ const port = 3000;
 // Serve static files from the "public" directory
 app.use(express.static(path.resolve(__dirname, "public")));
 app.use(express.static(path.resolve(__dirname, "src")));
+app.use(express.static(path.resolve(__dirname, "assets")));
 
 app.get("/", (req: Request, res: Response) => {
   // The static middleware will handle serving index.html

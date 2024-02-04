@@ -5,8 +5,8 @@
   "type": "module",
   "main": "index.js",
   "scripts": {
-    "dev": "esbuild src/main.ts --bundle --outfile=public/src/bundle.js && nodemon public/server.ts",
-    "build-server": "esbuild src/server.ts --bundle --outfile=public/src/serverBundle.js --format=esm --platform=node"
+    "dev": "nodemon -w src --exec \"esbuild src/main.ts --bundle --outfile=public/src/bundle.js && nodemon public/server.ts",
+    "dev-server": "nodemon public/server.ts"
   },
   "keywords": [
     "UI",
