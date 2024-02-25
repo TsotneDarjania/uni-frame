@@ -6,7 +6,7 @@ export class PreviewWebsite {
 
   root: any;
 
-  constructor(displayManager: DisplayManager) {
+  constructor() {
     const root = document.getElementById("app");
     const previewElement = document.createElement("div");
     previewElement.id = "preview";
