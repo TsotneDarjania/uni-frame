@@ -91,7 +91,7 @@ export default class MainManager {
     this.stateManager = new StateManager(this);
     this.displayManager = new DisplayManager();
     this.eventListener = new EventListener(this.setCommand.bind(this));
-    this.previwWebsite = new PreviewWebsite(this.displayManager);
+    this.previwWebsite = new PreviewWebsite();
   }
 
   buildSceneObject() {
