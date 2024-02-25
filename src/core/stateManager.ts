@@ -1,4 +1,5 @@
 import DisplayManager from "./displayManager";
+import MainManager from "./mainManager";
 
 export default class StateManager {
   states = {
@@ -6,23 +7,19 @@ export default class StateManager {
     isPreviewMode: false,
   };
 
-  displayManager!: DisplayManager;
-  constructor() {
-    this.displayManager = new DisplayManager();
-  }
+  constructor(public mainManager: MainManager) {}
 
   selectedObject!: string;
 
   changeState({ state, value }: { state: string; value: any }) {
     this.states[state as keyof typeof this.states] = value;
 
-    if (!this.states.isPreviewMode) {
-      this.states.isOpenBuildMenu
-        ? this.displayManager.showBuildMenu()
-        : this.displayManager.hideBuildMenu();
-    }
+    this.states.isPreviewMode
+      ? this.mainManager.displayManager.showPreviewMode(this.selectedObject)
+      : this.mainManager.displayManager.hidePreviewMode();
 
-    this.states.isPreviewMode &&
-      this.displayManager.showPreviewMode(this.selectedObject);
+    this.states.isOpenBuildMenu
+      ? this.mainManager.displayManager.showBuildMenu()
+      : this.mainManager.displayManager.hideBuildMenu();
   }
 }

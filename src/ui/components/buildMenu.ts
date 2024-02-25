@@ -2,7 +2,7 @@ import { ElementID } from "src/core/displayManager";
 import { BildMenuButtonEnums } from "src/enums/coreEnums";
 
 const buildComponent = `
-<ul style="visibility: hidden" id="build_menu" class="center-horizontal center-vertical">
+<ul style="visibility: hidden; z-index:10;" id="build_menu" class="center-horizontal center-vertical">
 <li class="">
   <h3 class="">Atomus</h3>
   <ul id="${ElementID.atomusOptions}">

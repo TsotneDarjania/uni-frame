@@ -3,31 +3,50 @@ import DisplayManager from "./displayManager";
 import EventListener from "./eventListener";
 import StateManager from "./stateManager";
 import { BildMenuButtonEnums, StateEnums } from "src/enums/coreEnums";
+import { PreviewWebsite } from "./previewWebsite";
 
 export default class MainManager {
   eventListener!: EventListener;
   stateManager!: StateManager;
+  displayManager!: DisplayManager;
+  previwWebsite!: PreviewWebsite;
 
   constructor() {
     this.init();
-
-    this.eventListener;
   }
 
   setCommand(command: CommandType) {
     const instructions = {
       userEvent: {
         mouseClick: () => {
-          this.stateManager.states.isPreviewMode &&
-            this.stateManager.selectedObject !== undefined &&
+          if (this.stateManager.states.isPreviewMode) {
             this.buildSceneObject();
+            this.stateManager.changeState({
+              state: StateEnums.isPreviewMode,
+              value: false,
+            });
+          }
         },
         pressKey: ({ key }: { key: string }) => {
           if (key === "A") {
-            this.stateManager.changeState({
-              state: StateEnums.isOpenBuildMenu,
-              value: !this.stateManager.states.isOpenBuildMenu,
-            });
+            !this.stateManager.states.isPreviewMode &&
+              this.stateManager.changeState({
+                state: StateEnums.isOpenBuildMenu,
+                value: !this.stateManager.states.isOpenBuildMenu,
+              });
+          }
+          if (key === "Q") {
+            this.stateManager.states.isPreviewMode &&
+              this.stateManager.changeState({
+                state: StateEnums.isPreviewMode,
+                value: false,
+              });
+
+            this.stateManager.states.isOpenBuildMenu &&
+              this.stateManager.changeState({
+                state: StateEnums.isOpenBuildMenu,
+                value: false,
+              });
           }
         },
 
@@ -45,10 +64,18 @@ export default class MainManager {
               state: StateEnums.isOpenBuildMenu,
               value: false,
             });
-            this.stateManager.changeState({
-              state: StateEnums.isPreviewMode,
-              value: true,
-            });
+            /*
+            setTimeOut is used to prevent the 
+            button from being selected before the
+             build menu is closed
+            */
+            setTimeout(() => {
+              this.stateManager.changeState({
+                state: StateEnums.isPreviewMode,
+                value: true,
+              });
+            }, 100);
+
             this.stateManager.selectedObject = button;
           }
         },
@@ -61,11 +88,13 @@ export default class MainManager {
   }
 
   init() {
-    this.stateManager = new StateManager();
+    this.stateManager = new StateManager(this);
+    this.displayManager = new DisplayManager();
     this.eventListener = new EventListener(this.setCommand.bind(this));
+    this.previwWebsite = new PreviewWebsite(this.displayManager);
   }
 
   buildSceneObject() {
-    alert("buildSceneObject");
+    this.previwWebsite.addNewObject(this.displayManager.sceneObject);
   }
 }

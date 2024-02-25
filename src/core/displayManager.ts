@@ -13,8 +13,7 @@ export enum ElementID {
 
 export default class DisplayManager {
   root: any;
-
-  updatePorcess!: NodeJS.Timeout;
+  sceneObject!: HTMLElement;
 
   constructor() {
     this.root = document.getElementById("app");
@@ -38,14 +37,17 @@ export default class DisplayManager {
     this.showPreviewObject(sceneObjectName);
   }
 
+  hidePreviewMode() {
+    this.sceneObject?.remove();
+  }
+
   private showPreviewObject(sceneObjectName: string) {
     this.root.insertAdjacentHTML("beforeend", defaultButton);
 
-    const sceneObject = document.getElementById(ElementID.defaultButton)!;
+    this.sceneObject = document.getElementById(ElementID.defaultButton)!;
     document.addEventListener("mousemove", (event) => {
-      // Update left property of sceneObject to match the mouse's X position
-      sceneObject.style.left = `${event.clientX}px`;
-      sceneObject.style.top = `${event.clientY}px`;
+      this.sceneObject.style.left = `${event.clientX}px`;
+      this.sceneObject.style.top = `${event.clientY}px`;
     });
   }
 

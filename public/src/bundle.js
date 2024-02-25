@@ -5,7 +5,7 @@
 
   // src/ui/components/buildMenu.ts
   var buildComponent = `
-<ul style="visibility: hidden" id="build_menu" class="center-horizontal center-vertical">
+<ul style="visibility: hidden; z-index:10;" id="build_menu" class="center-horizontal center-vertical">
 <li class="">
   <h3 class="">Atomus</h3>
   <ul id="${"atomus_options" /* atomusOptions */}">
@@ -58,7 +58,7 @@ ${buildMenu_default}
   // src/core/displayManager.ts
   var DisplayManager = class {
     root;
-    updatePorcess;
+    sceneObject;
     constructor() {
       this.root = document.getElementById("app");
       this.renderPage();
@@ -76,12 +76,15 @@ ${buildMenu_default}
     showPreviewMode(sceneObjectName) {
       this.showPreviewObject(sceneObjectName);
     }
+    hidePreviewMode() {
+      this.sceneObject?.remove();
+    }
     showPreviewObject(sceneObjectName) {
       this.root.insertAdjacentHTML("beforeend", defaultButton);
-      const sceneObject = document.getElementById("default_button" /* defaultButton */);
+      this.sceneObject = document.getElementById("default_button" /* defaultButton */);
       document.addEventListener("mousemove", (event) => {
-        sceneObject.style.left = `${event.clientX}px`;
-        sceneObject.style.top = `${event.clientY}px`;
+        this.sceneObject.style.left = `${event.clientX}px`;
+        this.sceneObject.style.top = `${event.clientY}px`;
       });
     }
     showElement(id) {
@@ -113,7 +116,6 @@ ${buildMenu_default}
     }
     addEventListenerForKeys() {
       document.addEventListener("keydown", (event) => {
-        console.log(event.key, "event.key");
         this.callBack({
           type: "userEvent" /* userEvent */,
           event: "pressKey" /* pressKey */,
@@ -139,21 +141,51 @@ ${buildMenu_default}
 
   // src/core/stateManager.ts
   var StateManager = class {
+    constructor(mainManager2) {
+      this.mainManager = mainManager2;
+    }
     states = {
       isOpenBuildMenu: false,
       isPreviewMode: false
     };
-    displayManager;
-    constructor() {
-      this.displayManager = new DisplayManager();
-    }
     selectedObject;
     changeState({ state, value }) {
       this.states[state] = value;
-      if (!this.states.isPreviewMode) {
-        this.states.isOpenBuildMenu ? this.displayManager.showBuildMenu() : this.displayManager.hideBuildMenu();
-      }
-      this.states.isPreviewMode && this.displayManager.showPreviewMode(this.selectedObject);
+      this.states.isPreviewMode ? this.mainManager.displayManager.showPreviewMode(this.selectedObject) : this.mainManager.displayManager.hidePreviewMode();
+      this.states.isOpenBuildMenu ? this.mainManager.displayManager.showBuildMenu() : this.mainManager.displayManager.hideBuildMenu();
+    }
+  };
+
+  // src/helper/mathFunctions.ts
+  function getRandomNumber(from, to) {
+    if (from > to) {
+      throw new Error(
+        "Invalid input parameters. The `from` parameter must be less than or equal to the `to` parameter."
+      );
+    }
+    const randomNumber = Math.floor(Math.random() * (to - from + 1)) + from;
+    return randomNumber;
+  }
+
+  // src/core/previewWebsite.ts
+  var PreviewWebsite = class {
+    sceneObjects = [];
+    root;
+    constructor(displayManager) {
+      const root = document.getElementById("app");
+      const previewElement = document.createElement("div");
+      previewElement.id = "preview";
+      root.appendChild(previewElement);
+      this.root = previewElement;
+    }
+    addNewObject(object) {
+      this.sceneObjects.push(object);
+      const newObject = object.cloneNode(true);
+      newObject.style.left = object.style.left;
+      newObject.style.top = object.style.top;
+      newObject.style.opacity = "1";
+      newObject.id = `button_${getRandomNumber(100, 1e4)}`;
+      this.root.appendChild(newObject);
     }
   };
 
@@ -161,21 +193,38 @@ ${buildMenu_default}
   var MainManager = class {
     eventListener;
     stateManager;
+    displayManager;
+    previwWebsite;
     constructor() {
       this.init();
-      this.eventListener;
     }
     setCommand(command) {
       const instructions = {
         userEvent: {
           mouseClick: () => {
-            this.stateManager.states.isPreviewMode && this.stateManager.selectedObject !== void 0 && this.buildSceneObject();
+            if (this.stateManager.states.isPreviewMode) {
+              this.buildSceneObject();
+              this.stateManager.changeState({
+                state: "isPreviewMode" /* isPreviewMode */,
+                value: false
+              });
+            }
           },
           pressKey: ({ key }) => {
             if (key === "A") {
-              this.stateManager.changeState({
+              !this.stateManager.states.isPreviewMode && this.stateManager.changeState({
                 state: "isOpenBuildMenu" /* isOpenBuildMenu */,
                 value: !this.stateManager.states.isOpenBuildMenu
+              });
+            }
+            if (key === "Q") {
+              this.stateManager.states.isPreviewMode && this.stateManager.changeState({
+                state: "isPreviewMode" /* isPreviewMode */,
+                value: false
+              });
+              this.stateManager.states.isOpenBuildMenu && this.stateManager.changeState({
+                state: "isOpenBuildMenu" /* isOpenBuildMenu */,
+                value: false
               });
             }
           },
@@ -185,10 +234,12 @@ ${buildMenu_default}
                 state: "isOpenBuildMenu" /* isOpenBuildMenu */,
                 value: false
               });
-              this.stateManager.changeState({
-                state: "isPreviewMode" /* isPreviewMode */,
-                value: true
-              });
+              setTimeout(() => {
+                this.stateManager.changeState({
+                  state: "isPreviewMode" /* isPreviewMode */,
+                  value: true
+                });
+              }, 100);
               this.stateManager.selectedObject = button;
             }
           }
@@ -197,15 +248,16 @@ ${buildMenu_default}
       instructions[command.type][command.event](command.details);
     }
     init() {
-      this.stateManager = new StateManager();
+      this.stateManager = new StateManager(this);
+      this.displayManager = new DisplayManager();
       this.eventListener = new EventListener(this.setCommand.bind(this));
+      this.previwWebsite = new PreviewWebsite(this.displayManager);
     }
     buildSceneObject() {
-      alert("buildSceneObject");
+      this.previwWebsite.addNewObject(this.displayManager.sceneObject);
     }
   };
 
   // src/main.ts
   var mainManager = new MainManager();
-  console.log("aaa");
 })();

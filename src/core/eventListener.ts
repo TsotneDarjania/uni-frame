@@ -20,7 +20,6 @@ export default class EventListener {
 
   addEventListenerForKeys() {
     document.addEventListener("keydown", (event) => {
-      console.log(event.key, "event.key");
       this.callBack({
         type: TypeEnums.userEvent,
         event: EventEnums.pressKey,
