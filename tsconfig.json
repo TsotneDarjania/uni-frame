@@ -23,7 +23,7 @@
   },
   "include": [
     "src/**/*.ts"
-  ],
+, "public/server.ts"  ],
   "exclude": [
     "node_modules"
   ]
